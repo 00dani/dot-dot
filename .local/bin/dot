@@ -1,0 +1,82 @@
+#!/usr/bin/env zsh
+
+bootstrap() {
+	echo 'Bootstrapping your dotfiles...' >&2
+	if ! hash stow 2>/dev/null; then
+		echo 'GNU Stow is not installed, fetching it...' >&2
+		clone stow
+		STOW=$DOTFILES/stow/.local/bin/stow
+	fi
+
+	mkdir -p ~/.zsh && touch ~/.zsh/zhistory
+	clone dot vim zsh
+	link
+}
+
+clone() {
+	for package in $argv; do
+		clone-one $package
+	done
+}
+
+clone-one() {
+	local url=$1
+	local package=${${url##*/}%.git}
+	# Simple package names are fetched from my GitHub repos.
+	[[ $url != */* ]] && url=git@github.com:$GITHUB_USER/dot-$package
+	# user/repo packages are fetched from that user's repos.
+	[[ $url != *:* ]] && url=https://github.com/$url
+	mkdir -p $DOTFILES
+	cd $DOTFILES
+	if [[ -d $package ]]; then
+		echo "Looks like you already have $package cloned." >&2
+		return 1
+	fi
+	echo "Retrieving $package from $url now..." >&2
+	git clone $url $package
+}
+
+link() {
+	local packages=($argv)
+	if (( $#packages == 0 )); then
+		echo 'Packages not given. Assuming all...' >&2
+		packages=( $DOTFILES/*(N:t) )
+	fi
+	echo "Linking $packages into $HOME now..." >&2
+	$STOW -d $DOTFILES -t ~ $packages
+}
+
+status() {
+	local packages=($argv)
+	(( $#packages == 0 )) && packages=( $DOTFILES/*(N:t) )
+	local length=${#${(O@)packages//?/X}[1]}
+	cd $DOTFILES
+	for p in $packages; do
+		pushd $p
+		printf "%${length}s  " $p
+		if [[ -z "$(command git status --porcelain --ignore-submodules -unormal)" ]]; then
+			print -P "%F{green}clean%f"
+		else
+			print -P "%F{red}unclean%f"
+		fi
+		popd
+	done
+}
+
+: ${DOTFILES:=~/dotfiles} ${STOW:=stow} ${GITHUB_USER:=00dani}
+
+local comm=$1
+if (( $# == 0 )); then
+	if [[ -d $DOTFILES ]]; then
+		comm=status
+	else
+		comm=bootstrap
+	fi
+fi
+
+case $comm in
+	bootstrap) bootstrap ;;
+	clone) clone ${argv[2,-1]} ;;
+	link) link ${argv[2,-1]} ;;
+	st|status) status ${argv[2,-1]} ;;
+esac
