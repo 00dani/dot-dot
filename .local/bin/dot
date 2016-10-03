@@ -4,18 +4,18 @@ bootstrap() {
 	echo 'Bootstrapping your dotfiles...' >&2
 	if ! hash stow 2>/dev/null; then
 		echo 'GNU Stow is not installed, fetching it...' >&2
-		clone stow
+		clone stow || return $?
 		STOW=$DOTFILES/stow/.local/bin/stow
 	fi
 
 	mkdir -p ~/.zsh && touch ~/.zsh/zhistory
-	clone dot vim zsh
+	clone dot vim zsh || return $?
 	link
 }
 
 clone() {
 	for package in $argv; do
-		clone-one $package
+		clone-one $package || return $?
 	done
 }
 
@@ -23,7 +23,7 @@ clone-one() {
 	local url=$1
 	local package=${${url##*/}%.git}
 	# Simple package names are fetched from my GitHub repos.
-	[[ $url != */* ]] && url=git@github.com:$GITHUB_USER/dot-$package
+	[[ $url != */* ]] && url=$GITHUB_USER/dot-$package
 	# user/repo packages are fetched from that user's repos.
 	[[ $url != *:* ]] && url=https://github.com/$url
 	mkdir -p $DOTFILES
