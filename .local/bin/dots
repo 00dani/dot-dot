@@ -9,7 +9,7 @@ bootstrap() {
 	fi
 
 	mkdir -p ~/.zsh && touch ~/.zsh/zhistory
-	clone dot vim zsh || return $?
+	clone dots vim zsh || return $?
 	link
 }
 
