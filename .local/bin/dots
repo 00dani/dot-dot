@@ -2,9 +2,11 @@
 
 bootstrap() {
 	echo 'Bootstrapping your dotfiles...' >&2
+	mkdir -p $DOTFILES
+	touch $DOTFILES/.stow
 	if ! hash stow 2>/dev/null; then
 		echo 'GNU Stow is not installed, fetching it...' >&2
-		clone stow || return $?
+		clone-one stow || return $?
 		STOW=$DOTFILES/stow/.local/bin/stow
 	fi
 
@@ -14,6 +16,7 @@ bootstrap() {
 }
 
 clone() {
+	echo "Requested packages: $argv" >&2
 	for package in $argv; do
 		clone-one $package || return $?
 	done
@@ -26,23 +29,26 @@ clone-one() {
 	[[ $url != */* ]] && url=$GITHUB_USER/dot-$package
 	# user/repo packages are fetched from that user's repos.
 	[[ $url != *:* ]] && url=https://github.com/$url
-	mkdir -p $DOTFILES
-	cd $DOTFILES
-	if [[ -d $package ]]; then
+	if [[ -d $DOTFILES/$package ]]; then
 		echo "Looks like you already have $package cloned." >&2
 		return 1
 	fi
 	echo "Retrieving $package from $url now..." >&2
-	git clone $url $package
+	git clone $url $DOTFILES/$package
 }
 
 link() {
 	local packages=($argv)
 	if (( $#packages == 0 )); then
-		echo 'Packages not given. Assuming all...' >&2
 		packages=( $DOTFILES/*(N:t) )
+		if (( $#packages == 0 )); then
+			echo "No installed packages! Do you want to clone some first?" >&2
+			return 1
+		fi
+		echo "Linking all packages ($packages) into $HOME now..." >&2
+	else
+		echo "Linking $packages into $HOME now..." >&2
 	fi
-	echo "Linking $packages into $HOME now..." >&2
 	$STOW -d $DOTFILES -t ~ $packages
 }
 
