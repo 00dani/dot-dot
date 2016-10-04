@@ -1,5 +1,4 @@
 #!/usr/bin/env zsh
-zmodload zsh/mapfile
 
 bootstrap() {
 	echo 'Bootstrapping your dotfiles...' >&2
@@ -56,6 +55,7 @@ link() {
 }
 
 process-stow-no-fold() {
+	zmodload zsh/mapfile
 	for file in ${(f)mapfile[$1]}; do
 		file=~/$file
 		[[ -e $file ]] && continue
