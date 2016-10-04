@@ -1,0 +1,12 @@
+#!/usr/bin/env zsh
+actualSize=$(wc -c < $1)
+
+for (( size = 0; size < actualSize; size++ )); do
+	head -c$size $1 | env -i HOME=$HOME/test zsh 2>/dev/null
+	if [[ -d $HOME/test ]]; then
+		percent=$(( size * 100 / actualSize ))
+		echo "dots still ran with only $size bytes available, " \
+			"$percent% of its full $actualSize bytes!" 2>/dev/null
+		exit $size
+	fi
+done
