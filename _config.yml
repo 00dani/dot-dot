@@ -1,9 +1,6 @@
 title: 00dani/dot-dots
 email: gopsychonauts@gmail.com
-description: >
-  Write an awesome description for your new site here. You can edit this
-  line in _config.yml. It will appear in your document head meta (for
-  Google search results) and in your feed.xml site description.
+description: Bootstrap and simple management script for 00dani's dotfiles
 twitter_username: 00d4n1
 github_username:  00dani
 
