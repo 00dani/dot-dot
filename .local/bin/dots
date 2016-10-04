@@ -83,7 +83,7 @@ status() {
 
 : ${DOTFILES:=~/dotfiles} ${STOW:=stow} ${GITHUB_USER:=00dani}
 
-local comm=$1
+comm=$1
 if (( $# == 0 )); then
 	if [[ -d $DOTFILES ]]; then
 		comm=status
