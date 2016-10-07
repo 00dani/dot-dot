@@ -37,7 +37,8 @@ clone-one() {
 }
 
 link() {
-	local packages=($argv)
+	local -a packages
+	packages=($argv)
 	if (( $#packages == 0 )); then
 		packages=( $DOTFILES/*(N:t) )
 		if (( $#packages == 0 )); then
@@ -65,7 +66,8 @@ process-stow-no-fold() {
 }
 
 status() {
-	local packages=($argv)
+	local -a packages
+	packages=($argv)
 	(( $#packages == 0 )) && packages=( $DOTFILES/*(N:t) )
 	local length=${#${(O@)packages//?/X}[1]}
 	cd $DOTFILES
