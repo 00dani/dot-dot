@@ -7,7 +7,7 @@ bootstrap() {
 	if ! hash stow 2>/dev/null; then
 		echo 'GNU Stow is not installed, fetching it...' >&2
 		clone-one stow || return $?
-		STOW=$DOTFILES/stow/.local/bin/stow
+		STOW=$DOTFILES/stow/local/bin/stow
 	fi
 
 	clone dots git vim zsh || return $?
