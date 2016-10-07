@@ -49,9 +49,9 @@ link() {
 		echo "Linking $packages into $HOME now..." >&2
 	fi
 
-	for nofold in $DOTFILES/${^packages}/.stow-no-fold(N); process-stow-no-fold $nofold
+	for nofold in $DOTFILES/${^packages}/.stow-no-folding(N); process-stow-no-folding $nofold
 
-	$STOW -d $DOTFILES -t ~ --ignore '^\.stow-no-fold' $packages
+	$STOW -d $DOTFILES -t ~ $packages
 }
 
 process-stow-no-fold() {
