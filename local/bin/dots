@@ -55,7 +55,7 @@ link() {
 	$STOW -d $DOTFILES -t ~ $packages
 }
 
-process-stow-no-fold() {
+process-stow-no-folding() {
 	zmodload zsh/mapfile
 	for file in ${(f)mapfile[$1]}; do
 		file=~/$file
