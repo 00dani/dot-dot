@@ -69,12 +69,15 @@ status() {
 	local -a packages
 	packages=($argv)
 	(( $#packages == 0 )) && packages=( $DOTFILES/*(N:t) )
-	local length=${#${(O@)packages//?/X}[1]}
+	local length=${#${(O@)packages//?/X}[1]} git_status
 	cd $DOTFILES
 	for p in $packages; do
 		pushd $p
 		printf "%${length}s  " $p
-		if [[ -z "$(command git status --porcelain --ignore-submodules -unormal)" ]]; then
+		git_status="$(command git status --porcelain --ignore-submodules -unormal 2>/dev/null)"
+		if (( $? != 0 )); then
+			print -P "%F{247}not a git repository%f"
+		elif [[ -z $git_status ]]; then
 			print -P "%F{green}clean%f"
 		else
 			print -P "%F{red}unclean%f"
