@@ -69,20 +69,40 @@ status() {
 	local -a packages
 	packages=($argv)
 	(( $#packages == 0 )) && packages=( $DOTFILES/*(N:t) )
-	local length=${#${(O@)packages//?/X}[1]} git_status
-	cd $DOTFILES
+	local length=${#${(O@)packages//?/X}[1]} git_status remote_status
 	for p in $packages; do
-		pushd $p
-		printf "%${length}s  " $p
-		git_status="$(command git status --porcelain --ignore-submodules -unormal 2>/dev/null)"
+		cd $DOTFILES/$p
+		# Always show the repo's name at the beginning of the line.
+		printf %${length}s'  ' $p
+
+		# Check if the package is actually a repo. It might not be if it's brand-new.
+		git_status="$(git status --porcelain --ignore-submodules -unormal 2>/dev/null)"
 		if (( $? != 0 )); then
-			print -P "%F{247}not a git repository%f"
-		elif [[ -z $git_status ]]; then
-			print -P "%F{green}clean%f"
-		else
-			print -P "%F{red}unclean%f"
+			printf '%9s' '' # space across to the last column
+			print -P %F{247}not a git repository%f
+			continue
 		fi
-		popd
+
+		# Indicate the working tree status.
+		if [[ -z $git_status ]]; then
+			print -Pn %F{green}clean%f'  '
+		else
+			print -Pn %F{red}unclean%f
+		fi
+		printf '%2s' ''
+
+		# If the repository has an upstream remote configured, indicate the number
+		# of commits out of sync we are from the remote.
+		if git rev-parse --abbrev-ref @{u} &>/dev/null; then
+			remote_status="$(git rev-list --left-right --count HEAD...@{u} 2>/dev/null)"
+			remote_status=(${(ps:\t:)remote_status})
+			print -Pn %F{cyan}
+			(( $remote_status[1] > 0 )) && print -n $remote_status[1]⇡
+			(( $remote_status[2] > 0 )) && print -n $remote_status[2]⇣
+			print -P %f
+		else
+			print -P %F{247}no remote%f
+		fi
 	done
 }
 
