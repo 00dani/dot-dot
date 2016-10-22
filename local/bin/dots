@@ -65,6 +65,16 @@ process-stow-no-folding() {
 	done
 }
 
+fetch() {
+	local -a packages
+	packages=($argv)
+	(( $#packages == 0 )) && packages=( $DOTFILES/*(N:t) )
+	for p in $packages; do
+		cd $DOTFILES/$p
+		git fetch -p
+	done
+}
+
 status() {
 	local -a packages
 	packages=($argv)
@@ -120,6 +130,7 @@ fi
 case $comm in
 	bootstrap) bootstrap ;;
 	clone) clone ${argv[2,-1]} ;;
+	fetch) fetch ${argv[2,-1]} ;;
 	link) link ${argv[2,-1]} ;;
 	st|status) status ${argv[2,-1]} ;;
 esac
