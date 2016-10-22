@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 
-bootstrap() {
+'bootstrap'() {
 	echo 'Bootstrapping your dotfiles...' >&2
 	mkdir -p $DOTFILES
 	touch $DOTFILES/.stow
@@ -14,14 +14,14 @@ bootstrap() {
 	link
 }
 
-clone() {
+'clone'() {
 	echo "Requested packages: $argv" >&2
 	for package in $argv; do
 		clone-one $package || return $?
 	done
 }
 
-clone-one() {
+'clone-one'() {
 	local url=$1
 	local package=${${url##*/}%.git}
 	# Simple package names are fetched from my GitHub repos.
@@ -36,7 +36,7 @@ clone-one() {
 	git clone $url $DOTFILES/$package
 }
 
-link() {
+'link'() {
 	local -a packages
 	packages=($argv)
 	if (( $#packages == 0 )); then
@@ -55,7 +55,7 @@ link() {
 	$STOW -d $DOTFILES -t ~ $packages
 }
 
-process-stow-no-folding() {
+'process-stow-no-folding'() {
 	zmodload zsh/mapfile
 	for file in ${(f)mapfile[$1]}; do
 		file=~/$file
@@ -65,7 +65,7 @@ process-stow-no-folding() {
 	done
 }
 
-fetch() {
+'fetch'() {
 	local -a packages
 	packages=($argv)
 	(( $#packages == 0 )) && packages=( $DOTFILES/*(N:t) )
@@ -75,7 +75,7 @@ fetch() {
 	done
 }
 
-status() {
+'status'() {
 	local -a packages
 	packages=($argv)
 	(( $#packages == 0 )) && packages=( $DOTFILES/*(N:t) )
