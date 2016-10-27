@@ -1,0 +1,34 @@
+#compdef dots
+: ${DOTFILES:=~/dotfiles}
+local context state state_descr line
+typeset -A opt_args
+
+local repo
+local -a commands repos new_repos
+commands=(
+	bootstrap:'set up initial dotfiles on a new system'
+	clone:'download dotfiles packages over Git'
+	fetch:'retrieve updates to your packages'
+	link:'install downloaded packages into your ~'
+	status:'check whether your packages have changes'
+)
+if ! _retrieve_cache dots-repositories; then
+	repos=($(curl -s 'https://api.github.com/users/00dani/repos' | jq -r '.[].full_name | select(startswith("00dani/dot-")) | .[11:]'))
+	_store_cache dots-repositories repos
+fi
+
+for repo in $repos; [[ -d $DOTFILES/$repo ]] || new_repos+=($repo)
+_arguments '1:cmds:->cmds' '*:: :->args'
+case $state in
+	cmds) _describe -t commands command commands ;;
+	args) case $line[1] in
+		bootstrap) _nothing ;; # no more arguments!
+		clone) 
+			if (( $#new_repos )); then 
+				_values -w package $new_repos
+			else
+				_message 'all known packages are already installed, you can still enter a git url manually'
+			fi ;;
+		fetch|link|st|status) _values -w package ${DOTFILES:-~/dotfiles}/*(/:t) ;;
+	esac ;;
+esac
