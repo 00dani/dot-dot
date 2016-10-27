@@ -29,6 +29,6 @@ case $state in
 			else
 				_message 'all known packages are already installed, you can still enter a git url manually'
 			fi ;;
-		fetch|link|st|status) _values -w package ${DOTFILES:-~/dotfiles}/*(/:t) ;;
+		fetch|link|st|status) _values -w package $DOTFILES/*(/:t) ;;
 	esac ;;
 esac
