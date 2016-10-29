@@ -10,6 +10,7 @@ commands=(
 	clone:'download dotfiles packages over Git'
 	fetch:'retrieve updates to your packages'
 	link:'install downloaded packages into your ~'
+	pull:'fetch and apply package updates'
 	status:'check whether your packages have changes'
 )
 if ! _retrieve_cache dots-repositories; then
@@ -29,6 +30,6 @@ case $state in
 			else
 				_message 'all known packages are already installed, you can still enter a git url manually'
 			fi ;;
-		fetch|link|st|status) _values -w package $DOTFILES/*(/:t) ;;
+		fetch|link|pull|st|status) _values -w package $DOTFILES/*(/:t) ;;
 	esac ;;
 esac

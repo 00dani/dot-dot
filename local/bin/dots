@@ -75,6 +75,17 @@
 	done
 }
 
+'pull'() {
+	local -a packages
+	packages=($argv)
+	(( $#packages == 0 )) && packages=( $DOTFILES/*(N:t) )
+	for p in $packages; do
+		cd $DOTFILES/$p
+		git pull
+	done
+}
+
+
 'status'() {
 	local -a packages
 	packages=($argv)
@@ -132,5 +143,6 @@ case $comm in
 	clone) clone ${argv[2,-1]} ;;
 	fetch) fetch ${argv[2,-1]} ;;
 	link) link ${argv[2,-1]} ;;
+	pull) pull ${argv[2,-1]} ;;
 	st|status) status ${argv[2,-1]} ;;
 esac
