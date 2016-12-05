@@ -5,7 +5,7 @@
 	echo 'Bootstrapping your dotfiles...' >&2
 	mkdir -p $DOTFILES
 	touch $DOTFILES/.stow
-	if ! hash stow 2>/dev/null; then
+	if (( ! $+commands[stow] )); then
 		echo 'GNU Stow is not installed, fetching it...' >&2
 		clone-one stow || return $?
 		STOW=$DOTFILES/stow/local/bin/stow
