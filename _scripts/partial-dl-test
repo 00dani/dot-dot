@@ -1,12 +1,28 @@
 #!/usr/bin/env zsh
-actualSize=$(wc -c < $1)
 
-for (( size = 0; size < actualSize; size++ )); do
-	head -c$size $1 | env -i HOME=$HOME/test zsh 2>/dev/null
-	if [[ -d $HOME/test ]]; then
-		percent=$(( size * 100 / actualSize ))
-		echo "dots still ran with only $size bytes available, " \
-			"$percent% of its full $actualSize bytes!" 2>/dev/null
+actualSize=$(wc -c < $1)
+testDir=$TMPDIR/dots-partial-dl-test-$UID-$$
+if [[ -d $testDir ]]; then
+	echo "$testDir exists, is this test already running?" >&2
+	echo "Refusing to launch. Remove $testDir manually if necessary." >&2
+	exit -1
+fi
+
+repeat-char() {
+	local char=$1
+	local -i count=$2
+	(( count )) && printf "$char%.0s" {1..$count}
+}
+
+for (( size = 0; size < actualSize - 1; size++ )); do
+	percent=$(( size * 100 / actualSize ))
+	progress=$(( percent / 10 ))
+	printf " [%-10s] [%${#actualSize}d/%d]\r" "$(repeat-char = $progress)" $size $actualSize >&2
+
+	head -c$size $1 | env -i HOME=$testDir zsh 2>/dev/null
+	if [[ -d $testDir ]]; then
+		rm -rf $testDir
+		printf "\ndots still ran with only %d bytes available, %d%% of its full %d bytes!\n" $size $percent $actualSize >&2
 		exit $size
 	fi
 done
