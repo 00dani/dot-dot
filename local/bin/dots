@@ -1,5 +1,5 @@
 #!/usr/bin/env zsh
-# <a href="https://dots.00dani.me/README">WHAT IS THIS</a>
+# <a href="https://dots.00dani.id.au/README">WHAT IS THIS</a>
 
 'bootstrap'() {
 	echo 'Bootstrapping your dotfiles...' >&2
