@@ -1,13 +1,9 @@
-title: 00dani/dot-dots
+title: dots.00dani.me
 email: dani@00dani.me
-description: "Bootstrap and simple management script for 00dani's dotfiles"
-twitter_username: 00d4n1
-github_username:  00dani
+description: "Bootstrap and simple management script for my dotfiles"
+github_username: 00dani
 url: 'https://dots.00dani.me'
 
 # Build settings
 theme: minima
 highlighter: rouge
-exclude:
-  - vendor
-  - Gemfile*
