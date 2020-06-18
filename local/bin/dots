@@ -25,9 +25,9 @@
 'clone-one'() {
 	local url=$1
 	local package=${${url##*/}%.git}
-	# Simple package names are fetched from my GitHub repos.
-	[[ $url != */* ]] && url=$GITHUB_USER/dot-$package
-	# user/repo packages are fetched from that user's repos.
+	# Simple package names are fetched from my Gitea dot repos.
+	[[ $url != */* ]] && url=https://git.00dani.me/dot/$package
+	# user/repo packages are fetched from that user's GitHub repos.
 	[[ $url != *:* ]] && url=https://github.com/$url
 	if [[ -d $DOTFILES/$package ]]; then
 		echo "Looks like you already have $package cloned." >&2
