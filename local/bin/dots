@@ -25,8 +25,8 @@
 'clone-one'() {
 	local url=$1
 	local package=${${url##*/}%.git}
-	# Simple package names are fetched from my Gitea dot repos.
-	[[ $url != */* ]] && url=https://git.00dani.me/dot/$package
+	# Simple package names are fetched from the configured source prefix.
+	[[ $url != */* ]] && url=$DOTS_SOURCE_PREFIX/$package
 	# user/repo packages are fetched from that user's GitHub repos.
 	[[ $url != *:* ]] && url=https://github.com/$url
 	if [[ -d $DOTFILES/$package ]]; then
@@ -129,7 +129,7 @@
 }
 
 'main'() {
-	: ${DOTFILES:=~/dotfiles} ${STOW:=stow} ${GITHUB_USER:=00dani}
+	: ${DOTFILES:=~/dotfiles} ${STOW:=stow} ${DOTS_SOURCE_PREFIX:=https://git.00dani.me/dot}
 
 	comm=$1
 	if (( $# == 0 )); then
