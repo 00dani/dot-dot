@@ -2,6 +2,6 @@
 layout: page
 permalink: /README
 ---
-{% capture readme_text %}{% include_relative README.md %}{% endcapture %}
+{% capture readme_text %}{% include_relative .dots/README.md %}{% endcapture %}
 {% assign readme_text = (readme_text | newline_to_br | split: "<br />" | shift | shift | join: '' ) %}
 {{ readme_text | markdownify }}

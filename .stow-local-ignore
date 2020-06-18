@@ -1,9 +1,3 @@
 ^/\.git.*
-^/CNAME
-^/Gemfile.*
 ^/README\.md
-^/css
-^/_.*
-^/\.sass-cache
-^/vendor
-^/.*\.html
+^/site.*
