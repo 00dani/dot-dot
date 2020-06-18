@@ -2,6 +2,9 @@ title: dot/dots
 email: dani@00dani.me
 description: "Bootstrap and simple management script for my dotfiles"
 github_username: 00dani
+mastodon:
+  - username: 00dani
+    instance: vulpine.club
 url: 'https://dots.00dani.me'
 
 # Build settings
