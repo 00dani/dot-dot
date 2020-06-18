@@ -1,4 +1,4 @@
-# dot/dots
+# dot/dots [![Netlify Status](https://api.netlify.com/api/v1/badges/807fb452-bfd3-406b-89f2-df1f2f239567/deploy-status)](https://app.netlify.com/sites/festive-gates-32b759/deploys)
 
 A fast and easy bootstrap for my dotfiles that also acts as a simple management script once installed. Bootstrapping is as simple as:
 
