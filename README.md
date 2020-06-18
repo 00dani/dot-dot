@@ -17,4 +17,16 @@ zsh dots
 
 When run through either of these methods, `dots` will install itself, [GNU Stow](https://www.gnu.org/software/stow/) (if not already installed globally), and my configuration for [git](https://git.00dani.me/dot/git), [vim](https://git.00dani.me/dot/vim), and [zsh](https://git.00dani.me/dot/zsh).
 
-Packages are installed by `dots` to `~/dotfiles` and then linked into `~` using Stow. I'll be adding flags for customising these paths, as well as adjusting which packages the bootstrap immediately installs.
+By default, packages are installed by `dots` to `~/dotfiles` and then linked into `~` using Stow. Environment variables are available for customising this behaviour.
+
+## Environment Variables
+
+* `DOTFILES` - the location to clone new packages. Defaults to `~/dotfiles`.
+  Don't set it to `~`, because that'll just be super confusing.
+* `DOTS_SOURCE_PREFIX` - a URL prefix that will be prepended to simple package
+  names, like "git" and "vim". Defaults to `https://git.00dani.me/dot`. You
+  might want to change this to point at your own Git hosting.
+* `STOW` - which GNU Stow binary to use. Defaults to `stow`. You probably don't
+  need to change this.
+* `HOME` - the target directory for linking packages. Probably not a good idea
+  to change this either.
