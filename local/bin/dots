@@ -128,22 +128,26 @@
 	done
 }
 
-: ${DOTFILES:=~/dotfiles} ${STOW:=stow} ${GITHUB_USER:=00dani}
+'main'() {
+	: ${DOTFILES:=~/dotfiles} ${STOW:=stow} ${GITHUB_USER:=00dani}
 
-comm=$1
-if (( $# == 0 )); then
-	if [[ -d $DOTFILES ]]; then
-		comm=status
-	else
-		comm=bootstrap
+	comm=$1
+	if (( $# == 0 )); then
+		if [[ -d $DOTFILES ]]; then
+			comm=status
+		else
+			comm=bootstrap
+		fi
 	fi
-fi
 
-case $comm in
-	bootstrap) bootstrap ;;
-	clone) clone ${argv[2,-1]} ;;
-	fetch) fetch ${argv[2,-1]} ;;
-	link) link ${argv[2,-1]} ;;
-	pull) pull ${argv[2,-1]} ;;
-	st|status) status ${argv[2,-1]} ;;
-esac
+	case $comm in
+		bootstrap) bootstrap ;;
+		clone) clone ${argv[2,-1]} ;;
+		fetch) fetch ${argv[2,-1]} ;;
+		link) link ${argv[2,-1]} ;;
+		pull) pull ${argv[2,-1]} ;;
+		st|status) status ${argv[2,-1]} ;;
+	esac
+}
+
+'main'
