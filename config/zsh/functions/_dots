@@ -14,7 +14,7 @@ commands=(
 	status:'check whether your packages have changes'
 )
 if ! _retrieve_cache dots-repositories; then
-	repos=($(curl -s 'https://api.github.com/users/00dani/repos' | jq -r '.[].full_name | select(startswith("00dani/dot-")) | .[11:]'))
+	repos=($(curl -s -X GET "https://git.00dani.me/api/v1/orgs/dot/repos" -H  "accept: application/json" | jq -r '.[].name'))
 	_store_cache dots-repositories repos
 fi
 
