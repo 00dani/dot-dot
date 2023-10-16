@@ -1,12 +1,21 @@
+---
 title: dot/dots
-email: dani@00dani.me
+author:
+  name: Danielle McLean
+  email: dani@00dani.me
 description: "Bootstrap and simple management script for my dotfiles"
-github_username: 00dani
-mastodon:
-  - username: 00dani
-    instance: elekk.club
 url: 'https://dots.00dani.me'
 
 # Build settings
 theme: minima
+minima:
+  skin: auto
+  social_links:
+    - platform: github
+      user_url: 'https://github.com/00dani'
+      title: 'GitHub'
+    - platform: mastodon
+      user_url: 'https://elekk.xyz/@00dani'
+      title: '@00dani@elekk.xyz'
+
 highlighter: rouge
