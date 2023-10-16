@@ -82,7 +82,7 @@ fetch() {
 	(( $#packages == 0 )) && packages=( $DOTFILES/*(N:t) )
 	for p in $packages; do
 		cd $DOTFILES/$p
-		git fetch -p
+		git fetch -p || return $?
 	done
 }
 
@@ -92,7 +92,7 @@ pull() {
 	(( $#packages == 0 )) && packages=( $DOTFILES/*(N:t) )
 	for p in $packages; do
 		cd $DOTFILES/$p
-		git pull
+		git pull || return $?
 	done
 }
 
@@ -157,8 +157,9 @@ main() {
 		link) link ${argv[2,-1]} ;;
 		pull) pull ${argv[2,-1]} ;;
 		st|status) status ${argv[2,-1]} ;;
+		*) echo "Unknown subcommand $comm" >&2; return 2 ;;
 	esac
 }
 
 main "$@"
-} # Wrap the entire program in a braced block so it won't run at all if you do curl | zsh and the connection drops.
+}
