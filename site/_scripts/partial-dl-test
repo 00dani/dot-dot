@@ -1,6 +1,7 @@
 #!/usr/bin/env zsh
 
-actualSize=$(wc -c < $1)
+script=$1
+actualSize=$(wc -c < $script)
 testDir=$TMPDIR/dots-partial-dl-test-$UID-$$
 if [[ -d $testDir ]]; then
 	echo "$testDir exists, is this test already running?" >&2
@@ -14,15 +15,51 @@ repeat-char() {
 	(( count )) && printf "$char%.0s" {1..$count}
 }
 
-for (( size = 0; size < actualSize - 1; size++ )); do
-	percent=$(( size * 100 / actualSize ))
-	progress=$(( percent / 10 ))
-	printf " [%-10s] [%${#actualSize}d/%d]\r" "$(repeat-char = $progress)" $size $actualSize >&2
+partial-dl-test() {
+	local -i showProgress=0 size=0 STATUS=0
+	local -F percent=0 progress=0
+	local OUT=''
+	mkdir $testDir
 
-	head -c$size $1 | env -i HOME=$testDir zsh 2>/dev/null
-	if [[ -d $testDir ]]; then
-		rm -rf $testDir
-		printf "\ndots still ran with only %d bytes available, %d%% of its full %d bytes!\n" $size $percent $actualSize >&2
-		exit $size
-	fi
-done
+	# We run the test for every partial filesize up to the actual size - 2,
+	# because we expect the script to work properly when the entirety has been
+	# downloaded, and it'll also work properly if just the last byte is missing
+	# because that last byte is a newline.
+	for (( size = 0; size < actualSize - 1; size++ )); do
+		percent=$(( size * 100.0 / actualSize ))
+		progress=$(( percent / 10 ))
+		(( showProgress++ % 100 == 0 || size == actualSize - 2 )) && printf " [%-10s] [%${#actualSize}d/%d]\r" "$(repeat-char = $progress)" $size $actualSize >&2
+
+		OUT=$(head -c$size $script | env -i HOME=$testDir/home zsh 2>&1)
+		STATUS=$?
+
+		if (( STATUS == 0 )); then
+			# If zsh silently did nothing, that's fine.
+			[[ -z $OUT ]] && continue
+			# If zsh non-silently reported a success, that's not fine.
+			print "dots reported a success with only $size bytes available, producing this output:${(qq)OUT}" >&2
+			return $size
+		fi
+
+		# There are a few error messages we can get from zsh that we expect to see when doing this kind of test.
+		if ! [[ $OUT = 'zsh: parse error'* ||
+			$OUT = 'zsh: unmatched '* ||
+			$OUT = 'zsh: closing brace expected' ||
+			$OUT = 'zsh: condition expected: '* ]]; then
+					print "dots produced unexpected output with only $size bytes available and status $STATUS: ${(qq)OUT}" >&2
+					return $size
+		fi
+
+		if [[ -d $testDir/home ]]; then
+			print "dots bootstrapped itself with only $size bytes available, $percent% of its full $actualSize bytes!" >&2
+			return $size
+		fi
+	done
+	print "dots safely did nothing for partially downloaded sizes up to $((size-1))/$actualSize bytes!" >&2
+}
+
+{
+	partial-dl-test
+} always {
+	rm -rf $testDir
+}
