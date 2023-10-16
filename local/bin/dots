@@ -1,6 +1,7 @@
 #!/usr/bin/env zsh
 # <a href="https://dots.00dani.me/README">WHAT IS THIS</a>
 
+{ # Wrap the entire program in a braced block so it won't run at all if you do curl | zsh and the connection drops.
 global_ignore=(
 	'\.git.*'
 	'README\.md'
@@ -10,7 +11,7 @@ global_ignore=(
 	'\..*\.swp'
 )
 
-'bootstrap'() {
+bootstrap() {
 	echo 'Bootstrapping your dotfiles...' >&2
 	mkdir -p $DOTFILES
 	touch $DOTFILES/.stow
@@ -24,14 +25,14 @@ global_ignore=(
 	link
 }
 
-'clone'() {
+clone() {
 	echo "Requested packages: $argv" >&2
 	for package in $argv; do
 		clone-one $package || return $?
 	done
 }
 
-'clone-one'() {
+clone-one() {
 	local url=$1
 	local package=${${url##*/}%.git}
 	# Simple package names are fetched from the configured source prefix.
@@ -46,7 +47,7 @@ global_ignore=(
 	git clone $url $DOTFILES/$package
 }
 
-'link'() {
+link() {
 	local -a packages
 	packages=($argv)
 	if (( $#packages == 0 )); then
@@ -65,7 +66,7 @@ global_ignore=(
 	$STOW -d $DOTFILES -t ~ --ignore=${^global_ignore} $packages
 }
 
-'process-stow-no-folding'() {
+process-stow-no-folding() {
 	zmodload zsh/mapfile
 	for file in ${(f)mapfile[$1]}; do
 		file=~/$file
@@ -75,7 +76,7 @@ global_ignore=(
 	done
 }
 
-'fetch'() {
+fetch() {
 	local -a packages
 	packages=($argv)
 	(( $#packages == 0 )) && packages=( $DOTFILES/*(N:t) )
@@ -85,7 +86,7 @@ global_ignore=(
 	done
 }
 
-'pull'() {
+pull() {
 	local -a packages
 	packages=($argv)
 	(( $#packages == 0 )) && packages=( $DOTFILES/*(N:t) )
@@ -96,7 +97,7 @@ global_ignore=(
 }
 
 
-'status'() {
+status() {
 	local -a packages
 	packages=($argv)
 	(( $#packages == 0 )) && packages=( $DOTFILES/*(N:t) )
@@ -137,7 +138,7 @@ global_ignore=(
 	done
 }
 
-'main'() {
+main() {
 	: ${DOTFILES:=~/dotfiles} ${STOW:=stow} ${DOTS_SOURCE_PREFIX:=https://git.00dani.me/dot}
 
 	comm=$1
@@ -159,4 +160,5 @@ global_ignore=(
 	esac
 }
 
-{'main' "$@"}
+main "$@"
+} # Wrap the entire program in a braced block so it won't run at all if you do curl | zsh and the connection drops.
