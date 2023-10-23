@@ -15,14 +15,26 @@ bootstrap() {
 	echo 'Bootstrapping your dotfiles...' >&2
 	mkdir -p $DOTFILES
 	touch $DOTFILES/.stow
-	if (( ! $+commands[stow] )); then
+	if (( $+commands[stow] )); then
+		local stow_version=${"$(stow -V)"#stow*version }
+		if [[ $stow_version != 2.3.2-fixbug56727 ]]; then
+			echo "GNU Stow is installed, but version $stow_version is bugged." >&2
+			echo 'See https://github.com/aspiers/stow/issues/33 for info.' >&2
+			echo 'Will fetch patched version of Stow...' >&2
+			install-custom-gnu-stow || return $?
+		fi
+	else
 		echo 'GNU Stow is not installed, fetching it...' >&2
-		clone-one stow || return $?
-		STOW=$DOTFILES/stow/local/bin/stow
+		install-custom-gnu-stow || return $?
 	fi
 
 	clone dots git vim zsh || return $?
 	link
+}
+
+install-custom-gnu-stow() {
+	clone-one stow || return $?
+	STOW=$DOTFILES/stow/dot-local/bin/stow
 }
 
 clone() {
@@ -63,7 +75,7 @@ link() {
 
 	for nofold in $DOTFILES/${^packages}/.stow-no-folding(N); process-stow-no-folding $nofold
 
-	$STOW -d $DOTFILES -t ~ --ignore=${^global_ignore} $packages
+	$STOW --dotfiles -d $DOTFILES -t ~ --ignore=${^global_ignore} $packages
 }
 
 process-stow-no-folding() {
