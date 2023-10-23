@@ -5,6 +5,7 @@
 global_ignore=(
 	'\.git.*'
 	'README\.md'
+	'\.editorconfig'
 	'\.stow-no-folding'
 	'\.stow-rename'
 	'\.mypy_cache'
