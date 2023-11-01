@@ -5,8 +5,9 @@ author:
   email: dani@00dani.me
 description: "Bootstrap and simple management script for my dotfiles"
 url: 'https://dots.00dani.me'
+exclude:
+  - netlify.toml
 
-# Build settings
 theme: minima
 minima:
   skin: auto

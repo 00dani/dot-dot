@@ -2,3 +2,6 @@ site/vendor
 site/_site
 site/.bundle
 site/.jekyll-cache
+
+# Local Netlify folder
+site/.netlify
