@@ -7,7 +7,6 @@ global_ignore=(
 	'README\.md'
 	'\.editorconfig'
 	'\.stow-no-folding'
-	'\.stow-rename'
 	'\.mypy_cache'
 	'\..*\.swp'
 )
