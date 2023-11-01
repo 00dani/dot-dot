@@ -7,6 +7,9 @@ description: "Bootstrap and simple management script for my dotfiles"
 url: 'https://dots.00dani.me'
 exclude:
   - netlify.toml
+  - package.json
+  - bun.lockb
+  - node_modules
 
 theme: minima
 minima:
