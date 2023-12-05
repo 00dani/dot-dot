@@ -50,9 +50,11 @@ Will clone one or more packages specified into your `DOTFILES` directory. Packag
 
 Will simply run `git fetch -p` for each of the specified package names. If there are no package names provided, will implicitly run over *all* packages.
 
-### `link`
+### `stow`
 
 Will employ GNU Stow to symlink each of the packages specified by name into your `HOME`. If no package names are provided, will implicitly link all packages.
+
+Additionally, `unstow` and `restow` commands are available with the same interface. These three commands correspond to the `-S`, `-D`, and `-R` modes Stow can be run in.
 
 ### `pull`
 
