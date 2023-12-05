@@ -65,6 +65,10 @@ clone-one() {
 	git clone $url $DOTFILES/$package
 }
 
+call-gnu-stow() {
+	$STOW --dotfiles -d $DOTFILES -t ~ --ignore=${^global_ignore} $argv
+}
+
 link() {
 	local -a packages
 	packages=($argv)
@@ -80,8 +84,42 @@ link() {
 	fi
 
 	for nofold in $DOTFILES/${^packages}/.stow-no-folding(N); process-stow-no-folding $nofold
+	call-gnu-stow -S $packages
+}
 
-	$STOW --dotfiles -d $DOTFILES -t ~ --ignore=${^global_ignore} $packages
+unlink() {
+	local -a packages
+	packages=($argv)
+	if (( $#packages == 0 )); then
+		packages=( $DOTFILES/*(N:t) )
+		if (( $#packages == 0 )); then
+			echo "No installed packages! There's nothing to unlink!" >&2
+			return 1
+		fi
+		echo "Unlinking all packages ($packages) from $HOME now..." >&2
+	else
+		echo "Unlinking $packages from $HOME now..." >&2
+	fi
+
+	call-gnu-stow -D $packages
+}
+
+relink() {
+	local -a packages
+	packages=($argv)
+	if (( $#packages == 0 )); then
+		packages=( $DOTFILES/*(N:t) )
+		if (( $#packages == 0 )); then
+			echo "No installed packages! Do you want to clone some first?" >&2
+			return 1
+		fi
+		echo "Relinking all packages ($packages) into $HOME now..." >&2
+	else
+		echo "Relinking $packages into $HOME now..." >&2
+	fi
+
+	for nofold in $DOTFILES/${^packages}/.stow-no-folding(N); process-stow-no-folding $nofold
+	call-gnu-stow -R $packages
 }
 
 process-stow-no-folding() {
@@ -173,6 +211,8 @@ main() {
 		clone) clone ${argv[2,-1]} ;;
 		fetch) fetch ${argv[2,-1]} ;;
 		link) link ${argv[2,-1]} ;;
+		unlink) unlink ${argv[2,-1]} ;;
+		relink) relink ${argv[2,-1]} ;;
 		pull) pull ${argv[2,-1]} ;;
 		st|status) status ${argv[2,-1]} ;;
 		*) echo "Unknown subcommand $comm" >&2; return 2 ;;
