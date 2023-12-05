@@ -35,7 +35,7 @@ bootstrap() {
 	fi
 
 	clone dots git vim zsh || return $?
-	link
+  do-stow
 }
 
 install-custom-gnu-stow() {
@@ -69,7 +69,7 @@ call-gnu-stow() {
 	$STOW --dotfiles -d $DOTFILES -t ~ --ignore=${^global_ignore} $argv
 }
 
-link() {
+do-stow() {
 	local -a packages
 	packages=($argv)
 	if (( $#packages == 0 )); then
@@ -78,33 +78,33 @@ link() {
 			echo "No installed packages! Do you want to clone some first?" >&2
 			return 1
 		fi
-		echo "Linking all packages ($packages) into $HOME now..." >&2
+		echo "Stowing all packages ($packages) into $HOME now..." >&2
 	else
-		echo "Linking $packages into $HOME now..." >&2
+		echo "Stowing $packages into $HOME now..." >&2
 	fi
 
 	for nofold in $DOTFILES/${^packages}/.stow-no-folding(N); process-stow-no-folding $nofold
 	call-gnu-stow -S $packages
 }
 
-unlink() {
+do-unstow() {
 	local -a packages
 	packages=($argv)
 	if (( $#packages == 0 )); then
 		packages=( $DOTFILES/*(N:t) )
 		if (( $#packages == 0 )); then
-			echo "No installed packages! There's nothing to unlink!" >&2
+			echo "No installed packages! There's nothing to unstow!" >&2
 			return 1
 		fi
-		echo "Unlinking all packages ($packages) from $HOME now..." >&2
+		echo "Unstowing all packages ($packages) from $HOME now..." >&2
 	else
-		echo "Unlinking $packages from $HOME now..." >&2
+		echo "Unstowing $packages from $HOME now..." >&2
 	fi
 
 	call-gnu-stow -D $packages
 }
 
-relink() {
+do-restow() {
 	local -a packages
 	packages=($argv)
 	if (( $#packages == 0 )); then
@@ -113,9 +113,9 @@ relink() {
 			echo "No installed packages! Do you want to clone some first?" >&2
 			return 1
 		fi
-		echo "Relinking all packages ($packages) into $HOME now..." >&2
+		echo "Restowing all packages ($packages) into $HOME now..." >&2
 	else
-		echo "Relinking $packages into $HOME now..." >&2
+		echo "Restowing $packages into $HOME now..." >&2
 	fi
 
 	for nofold in $DOTFILES/${^packages}/.stow-no-folding(N); process-stow-no-folding $nofold
@@ -210,9 +210,9 @@ main() {
 		bootstrap) bootstrap ;;
 		clone) clone ${argv[2,-1]} ;;
 		fetch) fetch ${argv[2,-1]} ;;
-		link) link ${argv[2,-1]} ;;
-		unlink) unlink ${argv[2,-1]} ;;
-		relink) relink ${argv[2,-1]} ;;
+		stow) do-stow ${argv[2,-1]} ;;
+		unstow) do-unstow ${argv[2,-1]} ;;
+		restow) do-restow ${argv[2,-1]} ;;
 		pull) pull ${argv[2,-1]} ;;
 		st|status) status ${argv[2,-1]} ;;
 		*) echo "Unknown subcommand $comm" >&2; return 2 ;;
