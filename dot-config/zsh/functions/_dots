@@ -9,7 +9,9 @@ commands=(
 	bootstrap:'set up initial dotfiles on a new system'
 	clone:'download dotfiles packages over Git'
 	fetch:'retrieve updates to your packages'
-	link:'install downloaded packages into your ~'
+	stow:'stow downloaded packages into your ~'
+	unstow:'unstow installed packages (cleans up their symlinks)'
+	restow:'unstow then stow installed packages (may be useful if package layout changed)'
 	pull:'fetch and apply package updates'
 	status:'check whether your packages have changes'
 )
@@ -30,6 +32,6 @@ case $state in
 			else
 				_message 'all known packages are already installed, you can still enter a git url manually'
 			fi ;;
-		fetch|link|pull|st|status) _values -w package $DOTFILES/*(/:t) ;;
+		fetch|*stow|pull|st|status) _values -w package $DOTFILES/*(/:t) ;;
 	esac ;;
 esac
