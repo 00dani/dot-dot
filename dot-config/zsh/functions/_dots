@@ -1,8 +1,5 @@
 #compdef dots
 : ${DOTFILES:=~/dotfiles}
-local context state state_descr line
-typeset -A opt_args
-
 local repo
 local -a commands repos new_repos
 commands=(
@@ -15,23 +12,31 @@ commands=(
 	pull:'fetch and apply package updates'
 	status:'check whether your packages have changes'
 )
+
 if ! _retrieve_cache dots-repositories; then
 	repos=($(curl -s -X GET "https://git.00dani.me/api/v1/orgs/dot/repos" -H  "accept: application/json" | jq -r '.[].name'))
 	_store_cache dots-repositories repos
 fi
+for repo in $repos; [[ -d $DOTFILES/$repo ]] || new_repos+=$repo
 
-for repo in $repos; [[ -d $DOTFILES/$repo ]] || new_repos+=($repo)
-_arguments '1:cmds:->cmds' '*:: :->args'
-case $state in
-	cmds) _describe -t commands command commands ;;
-	args) case $line[1] in
+_dots_subcommands() {
+	_describe -t commands command commands
+}
+
+_dots_subcommand_parameters() {
+	case $words[1] in
 		bootstrap) _nothing ;; # no more arguments!
-		clone) 
-			if (( $#new_repos )); then 
+		clone)
+			if (( $#new_repos )); then
 				_values -w package $new_repos
 			else
 				_message 'all known packages are already installed, you can still enter a git url manually'
 			fi ;;
 		fetch|*stow|pull|st|status) _values -w package $DOTFILES/*(/:t) ;;
-	esac ;;
-esac
+	esac
+}
+
+_arguments \
+	'(-v --verbose)'{-v,--verbose}'[request verbose output from Git and Stow]' \
+	': :_dots_subcommands' \
+	'*:: :_dots_subcommand_parameters'
