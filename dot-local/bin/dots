@@ -15,6 +15,14 @@ supported_stow_versions=(
 	2.3.2-fixbug56727
 )
 
+call-git() {
+	git $argv ${VERBOSE:+-v}
+}
+
+call-gnu-stow() {
+	$STOW --dotfiles -d $DOTFILES -t ~ --ignore=${^global_ignore} ${VERBOSE:+-vvv} $argv
+}
+
 do-bootstrap() {
 	echo 'Bootstrapping your dotfiles...' >&2
 	mkdir -p $DOTFILES
@@ -62,11 +70,7 @@ clone-one() {
 		return 1
 	fi
 	echo "Retrieving $package from $url now..." >&2
-	git clone $url $DOTFILES/$package
-}
-
-call-gnu-stow() {
-	$STOW --dotfiles -d $DOTFILES -t ~ --ignore=${^global_ignore} $argv
+	call-git clone $url $DOTFILES/$package
 }
 
 do-stow() {
@@ -138,7 +142,7 @@ do-fetch() {
 	(( $#packages == 0 )) && packages=( $DOTFILES/*(N:t) )
 	for p in $packages; do
 		cd $DOTFILES/$p
-		git fetch -p || return $?
+		call-git fetch -p || return $?
 	done
 }
 
@@ -148,7 +152,7 @@ do-pull() {
 	(( $#packages == 0 )) && packages=( $DOTFILES/*(N:t) )
 	for p in $packages; do
 		cd $DOTFILES/$p
-		git pull || return $?
+		call-git pull || return $?
 	done
 }
 
@@ -164,7 +168,7 @@ do-status() {
 		printf %${length}s'  ' $p
 
 		# Check if the package is actually a repo. It might not be if it's brand-new.
-		git_status="$(git status --porcelain --ignore-submodules -unormal 2>/dev/null)"
+		git_status="$(call-git status --porcelain --ignore-submodules -unormal 2>/dev/null)"
 		if (( $? != 0 )); then
 			printf '%9s' '' # space across to the last column
 			print -P %F{247}not a git repository%f
@@ -196,6 +200,12 @@ do-status() {
 
 main() {
 	: ${DOTFILES:=~/dotfiles} ${STOW:=stow} ${DOTS_SOURCE_PREFIX:=https://git.00dani.me/dot}
+
+	local opt_index=$argv[(I)(-v|--verbose)]
+	if (( opt_index != 0 )); then
+		VERBOSE=yes
+		argv[opt_index]=()
+	fi
 
 	comm=$1
 	if (( $# == 0 )); then
