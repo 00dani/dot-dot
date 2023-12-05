@@ -15,7 +15,7 @@ supported_stow_versions=(
 	2.3.2-fixbug56727
 )
 
-bootstrap() {
+do-bootstrap() {
 	echo 'Bootstrapping your dotfiles...' >&2
 	mkdir -p $DOTFILES
 	touch $DOTFILES/.stow
@@ -34,7 +34,7 @@ bootstrap() {
 		install-custom-gnu-stow || return $?
 	fi
 
-	clone dots git vim zsh || return $?
+	do-clone dots git vim zsh || return $?
   do-stow
 }
 
@@ -43,7 +43,7 @@ install-custom-gnu-stow() {
 	STOW=$DOTFILES/stow/dot-local/bin/stow
 }
 
-clone() {
+do-clone() {
 	echo "Requested packages: $argv" >&2
 	for package in $argv; do
 		clone-one $package || return $?
@@ -132,7 +132,7 @@ process-stow-no-folding() {
 	done
 }
 
-fetch() {
+do-fetch() {
 	local -a packages
 	packages=($argv)
 	(( $#packages == 0 )) && packages=( $DOTFILES/*(N:t) )
@@ -142,7 +142,7 @@ fetch() {
 	done
 }
 
-pull() {
+do-pull() {
 	local -a packages
 	packages=($argv)
 	(( $#packages == 0 )) && packages=( $DOTFILES/*(N:t) )
@@ -153,7 +153,7 @@ pull() {
 }
 
 
-status() {
+do-status() {
 	local -a packages
 	packages=($argv)
 	(( $#packages == 0 )) && packages=( $DOTFILES/*(N:t) )
@@ -207,14 +207,14 @@ main() {
 	fi
 
 	case $comm in
-		bootstrap) bootstrap ;;
-		clone) clone ${argv[2,-1]} ;;
-		fetch) fetch ${argv[2,-1]} ;;
+		bootstrap) do-bootstrap ;;
+		clone) do-clone ${argv[2,-1]} ;;
+		fetch) do-fetch ${argv[2,-1]} ;;
 		stow) do-stow ${argv[2,-1]} ;;
 		unstow) do-unstow ${argv[2,-1]} ;;
 		restow) do-restow ${argv[2,-1]} ;;
-		pull) pull ${argv[2,-1]} ;;
-		st|status) status ${argv[2,-1]} ;;
+		pull) do-pull ${argv[2,-1]} ;;
+		st|status) do-status ${argv[2,-1]} ;;
 		*) echo "Unknown subcommand $comm" >&2; return 2 ;;
 	esac
 }
