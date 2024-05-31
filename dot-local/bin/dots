@@ -3,7 +3,7 @@
 
 { # Wrap the entire program in a braced block so it won't run at all if you do curl | zsh and the connection drops.
 global_ignore=(
-	'\.git.*'
+	'^\.git.*'
 	'README\.md'
 	'\.editorconfig'
 	'\.stow-no-folding'
