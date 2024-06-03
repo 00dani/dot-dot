@@ -13,6 +13,7 @@ global_ignore=(
 
 supported_stow_versions=(
 	2.3.2-fixbug56727
+	2.4.0
 )
 
 call-git() {
